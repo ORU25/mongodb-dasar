@@ -1,0 +1,8 @@
+menjalankan mongodb dari directory mongodb
+
+    ./bin/mongod --dbpath=data
+
+
+menjalankan mongo shell dari directory mongosh
+
+    ./bin/mongosh "mongodb://localhost:27017"
