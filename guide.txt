@@ -6,3 +6,9 @@ menjalankan mongodb dari directory mongodb
 menjalankan mongo shell dari directory mongosh
 
     ./bin/mongosh "mongodb://localhost:27017"
+
+
+menjalan mongosh dengan auth
+
+    ./bin/mongosh "mongodb://username:password@localhost:27017/database?authsource=admin"
+    ./bin/mongosh "mongodb://mongo:mongo@localhost:27017/belajar?authsource=admin"

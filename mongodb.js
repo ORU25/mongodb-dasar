@@ -588,4 +588,211 @@ db.customers.bulkWrite([
 ])
 
 
-// indexes
+// Indexes
+
+// single index
+db.products.createIndex({
+    category: 1
+})
+
+db.products.dropIndex("category_1")
+
+db.products.find({
+    category: "food"
+})
+
+db.products.find({
+    category: "food"
+}).sort({
+    category: 1
+}).explain()
+
+db.products.find({
+    tags: "samsung"
+}).explain()
+
+// compound index
+db.products.createIndex({
+    stock:1,
+    tags:1
+})
+
+db.products.find({
+    stock: 10,
+    tags: 'popular'
+})
+
+db.products.find({
+    stock: 10,
+    tags: 'popular'
+}).explain()
+
+
+// Text Indexes
+db.products.createIndex({
+    name: "text",
+    category: "text",
+    tags: "text",
+},{
+    weight:{
+        name: 10,
+        category: 5,
+        tags: 1
+    }
+})
+
+db.products.find({
+    $text: {
+        $search: "mie"
+    }
+})
+db.products.find({
+    $text: {
+        $search: "mie laptop"
+    }
+})
+db.products.find({
+    $text: {
+        $search: '"mie sedap"'
+    }
+})
+db.products.find({
+    $text: {
+        $search: "mie -sedap"
+    }
+})
+
+db.products.find({
+    $text: {
+        $search: 'mie laptop'
+    }
+},{
+    searchScore:{
+        $meta: "textScore"
+    }
+})
+
+
+// Wildcard Indexes
+db.customers.createIndex({
+    "customFields.$**":1
+})
+
+db.customers.insertMany([
+    {
+        _id: "budi",
+        full_name: "budi",
+        customFields: {
+            hobby: "Gaming",
+            university: "Universitas Belum Ada"
+        }
+    },
+    {
+        _id: "rudi",
+        full_name: "rudi",
+        customFields: {
+            ipk:3.2,
+            university: "Universitas Belum Ada"
+        }
+    },
+    {
+        _id: "rudeus",
+        full_name: "rudeus",
+        customFields: {
+            motherName: "Tini",
+            passion: "Enterpreneur"
+        }
+    },
+])
+
+db.customers.find({
+    "customFields.passion" : 'Enterpreneur'
+})
+db.customers.find({
+    "customFields.hobby" : 'Gaming'
+})
+db.customers.find({
+    "customFields.ipk" : 3.2
+})
+
+
+// Index Propertioes
+db.createCollection('sessions')
+
+db.sessions.createIndex({
+    createdAt: 1,
+},{
+    expireAfterSeconds: 10
+})
+
+db.sessions.insertOne({
+    _id: 1,
+    session: 'Session 1',
+    createdAt: new Date()
+})
+
+db.customers.createIndex({
+    email: 1
+},{
+    unique: true,
+    sparse: true
+})
+
+db.customers.updateOne({
+    _id: "joko"
+},{
+    $set: {
+        email: "joko@example.com"
+    }
+})
+
+db.customers.createIndex({
+    full_name: 1,
+},{
+    collation:{
+        locale: "en",
+        strength: 2
+    }
+})
+
+db.customers.find({
+    full_name: "m haykal Makhmud"
+}).collation({
+        locale: "en",
+        strength: 2
+})
+
+db.products.createIndex({
+    price: 1
+},{
+    partialFilterExpression: {
+        stock:{
+            $gt: 0
+        }
+    }
+})
+
+db.products.find({
+    price: 2500,
+    stock: {
+        $gt: 0
+    }
+})
+
+
+// security
+"use admin"
+
+db.createUser({
+    user:'mongo',
+    pwd:'mongo',
+    roles: [
+        'userAdminAnyDatabase',
+        'readWriteAnyDatabase'
+    ]
+})
+
+'./bin/mongosh "mongodb://mongo:mongo@localhost:27017/belajar?authsource=admin"'
+
+
+// User Management
