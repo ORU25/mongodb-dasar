@@ -796,3 +796,120 @@ db.createUser({
 
 
 // User Management
+"use admin"
+
+db.createUser({
+    user: "contoh",
+    pwd: "contoh",
+    roles: [
+        {
+            role: "read",
+            db: "test"
+        }
+    ]
+})
+db.createUser({
+    user: "contoh2",
+    pwd: "contoh2",
+    roles: [
+        {
+            role: "readWrite",
+            db: "test"
+        }
+    ]
+})
+
+'./bin/mongosh "mongodb://contoh:contoh@localhost:27017/test?authsource=admin"'
+'./bin/mongosh "mongodb://contoh2:contoh2@localhost:27017/test?authsource=admin"'
+
+db.sample.insertOne({
+    _id: 1,
+    name: "eko"
+})
+
+db.changeUserPassword("contoh","rahasia")
+
+db.dropUser("contoh")
+
+db.updateUser("contoh2",{
+    roles: [
+        {
+            role: "readWrite",
+            db: "test"
+        },
+        {
+            role: "readWrite",
+            db: "belajar"
+        },
+    ]
+})
+
+
+// Role
+db.createRole({
+    role: 'session_management',
+    roles: [
+        {
+            role: 'read',
+            db: 'belajar'
+        }
+    ],
+    privileges: [
+        {
+            resource: {
+                db: 'belajar',
+                collection: 'sessions'
+            },
+            actions: [
+                'insert',
+            ]
+        }
+    ]
+})
+
+db.getRoles({
+    showPrivileges: true
+}) 
+
+db.createUser({
+    user: "eko",
+    pwd:"eko",
+    roles: [
+        'session_management'
+    ]
+})
+
+db.sessions.insertOne({
+    _id: 1,
+    name: 'test',
+})
+
+db.sessions.deleteOne({
+    _id: 1
+})
+
+db.sessions.updateOne({
+    _id: 1
+},{
+    $set: {
+        name: 'test lagi'
+    }
+})
+
+
+// Backup menggunakan mongodb tools
+
+// mongodump
+'./bin/mongodump --uri="mongodb://mongo:mongo@localhost:27017/belajar?authsource=admin" --out=./backup-dump'
+
+// mongoexport
+'./bin/mongoexport --uri="mongodb://mongo:mongo@localhost:27017/belajar?authsource=admin" --collection=customers --out=customers.json'
+
+
+// Restore menggunakan mongodb tools
+
+// mongorestore untuk mongodump
+'./bin/mongorestore --uri="mongodb://mongo:mongo@localhost:27017/belajar_restore?authsource=admin" --dir=backup-dump/belajar'
+
+// mongoimport untuk mongoexport
+'./bin/mongoimport --uri="mongodb://mongo:mongo@localhost:27017/belajar_import?authsource=admin" --collection=customers --file=customers.json'
